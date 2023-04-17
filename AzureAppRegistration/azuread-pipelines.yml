@@ -1,0 +1,25 @@
+resources:
+    repositories:
+      - repository: templates
+        type: git
+        name: 'Infrastructure Automation/AzureDevOps.Pipeline.Templates'  
+  
+trigger:
+    branches:
+        include: 
+        - master
+    paths:
+        include: 
+        - AzureAppRegistration
+          
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+extends:
+    template: azuread/appregistration.yaml@templates
+    parameters: 
+        appregistrationDefinition: /AzureAppRegistration/azureead.yml
+        includecertificate: false
+        includeDev: true
+        includeQA: true
+        includeUAT: true    
+        includeProd: true

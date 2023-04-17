@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRIMS.Monitor.API", "src\TRIMS.Monitor.API\TRIMS.Monitor.API.csproj", "{43E0048E-E73E-41F2-B794-7F3A3ABED2EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRIMS.Monitor.Entity", "src\TRIMS.Monitor.Entity\TRIMS.Monitor.Entity.csproj", "{5C4BCB98-4EAC-4632-BEF4-9A966CE5A7EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRIMS.Monitor.Repository", "src\TRIMS.Monitor.Repository\TRIMS.Monitor.Repository.csproj", "{76DA67E7-B79A-4E9B-BFA5-8D3436F7B220}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRIMS.Monitor.Manager", "src\TRIMS.Monitor.Manager\TRIMS.Monitor.Manager.csproj", "{2711BFF1-F035-4C5C-8EA4-5F84E9EB0339}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRIMS.Monitor.Service", "src\TRIMS.Monitor.Service\TRIMS.Monitor.Service.csproj", "{3D495774-42D4-4766-BABB-181B47D3B0FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureAppRegistration", "AzureAppRegistration", "{06ADCCA0-24FE-4E71-AF8E-A8008463BE1D}"
+	ProjectSection(SolutionItems) = preProject
+		AzureAppRegistration\azuread-pipelines.yml = AzureAppRegistration\azuread-pipelines.yml
+		AzureAppRegistration\azuread.yml = AzureAppRegistration\azuread.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43E0048E-E73E-41F2-B794-7F3A3ABED2EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43E0048E-E73E-41F2-B794-7F3A3ABED2EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43E0048E-E73E-41F2-B794-7F3A3ABED2EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43E0048E-E73E-41F2-B794-7F3A3ABED2EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C4BCB98-4EAC-4632-BEF4-9A966CE5A7EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C4BCB98-4EAC-4632-BEF4-9A966CE5A7EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C4BCB98-4EAC-4632-BEF4-9A966CE5A7EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C4BCB98-4EAC-4632-BEF4-9A966CE5A7EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76DA67E7-B79A-4E9B-BFA5-8D3436F7B220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DA67E7-B79A-4E9B-BFA5-8D3436F7B220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DA67E7-B79A-4E9B-BFA5-8D3436F7B220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DA67E7-B79A-4E9B-BFA5-8D3436F7B220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2711BFF1-F035-4C5C-8EA4-5F84E9EB0339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2711BFF1-F035-4C5C-8EA4-5F84E9EB0339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2711BFF1-F035-4C5C-8EA4-5F84E9EB0339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2711BFF1-F035-4C5C-8EA4-5F84E9EB0339}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D495774-42D4-4766-BABB-181B47D3B0FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D495774-42D4-4766-BABB-181B47D3B0FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D495774-42D4-4766-BABB-181B47D3B0FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D495774-42D4-4766-BABB-181B47D3B0FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E22471A4-CD67-4B5B-AA3B-8D1C9B1975C9}
+	EndGlobalSection
+EndGlobal

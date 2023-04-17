@@ -1,0 +1,101 @@
+displayname: "SecurityAdministration"
+userAssignmentRequired: true
+useDefaultApiPermissions: true
+allowImplicitFlow: true
+applicationRoles:
+  - value: AllowedGroups
+    displayname: AllowedGroups
+    description: Allows Specific Groups
+    allowedMemberType: User 
+  - value: SecAdmin_AppManagement
+    displayname: SecAdmin_AppManagement
+    description: Can perform application menu actions
+    allowedMemberType: User
+  - value: SecAdmin_UserManagement
+    displayname: SecAdmin_UserManagement
+    description: Can perform user menu actions
+    allowedMemberType: User
+
+dev:
+  homepage: "https://localhost"
+  replyuris:
+  - "https://dev.gke-commonorig.mrcooper.io/securityadministrationapi"
+  - "https://securityadministrationdev.mrcooper.io/"
+  - "https://dev.gke-commonorig.mrcooper.io/securityadministrationapi/swagger/oauth2-redirect.html"
+  - "https://localhost:7105/swagger/oauth2-redirect.html"
+  - "http://localhost:3000/"
+  groups:
+    "Application-SecAdmin_NonProd": 
+      - AllowedGroups
+    "SecAdmin_AppManagement_NonProd": 
+      - SecAdmin_AppManagement
+    "SecAdmin_UserManagement_NonProd": 
+      - SecAdmin_UserManagement
+  
+qa:
+  homepage: "https://localhost"
+  replyuris:
+  - "https://qa.gke-commonorig.mrcooper.io/securityadministrationapi"
+  - "https://securityadministrationqa.mrcooper.io/"
+  - "https://qa.gke-commonorig.mrcooper.io/securityadministrationapi/swagger/oauth2-redirect.html"
+  groups:
+    "Application-SecAdmin_NonProd": 
+      - AllowedGroups
+    "SecAdmin_AppManagement_NonProd": 
+      - SecAdmin_AppManagement
+    "SecAdmin_UserManagement_NonProd": 
+      - SecAdmin_UserManagement
+    
+uat:
+  homepage: "https://localhost"
+  replyuris:
+  - "https://uat.gke-commonorig.mrcooper.io/securityadministrationapi"
+  - "https://securityadministrationuat.mrcooper.io/"
+  - "https://uat.gke-commonorig.mrcooper.io/securityadministrationapi/swagger/oauth2-redirect.html"
+  groups:
+    "Application-SecAdmin_NonProd": 
+      - AllowedGroups
+    "Application-SecAdmin": 
+      - AllowedGroups
+    "SecAdmin_AppManagement_NonProd": 
+      - SecAdmin_AppManagement
+    "SecAdmin_UserManagement_NonProd": 
+      - SecAdmin_UserManagement
+    "SecAdmin_AppManagement": 
+      - SecAdmin_AppManagement
+    "SecAdmin_UserManagement": 
+      - SecAdmin_UserManagement
+    
+prod:
+  homepage: "https://localhost"
+  replyuris:
+  - "https://prod.gke-commonorig.mrcooper.io/securityadministrationapi"
+  - "https://securityadministration.mrcooper.io/"
+  - "https://prod.gke-commonorig.mrcooper.io/securityadministrationapi/swagger/oauth2-redirect.html"
+  groups:
+    "Application-SecAdmin": 
+      - AllowedGroups
+    "SecAdmin_AppManagement": 
+      - SecAdmin_AppManagement
+    "SecAdmin_UserManagement": 
+      - SecAdmin_UserManagement
+requiredPermissions:
+  00000003-0000-0000-c000-000000000000:
+    e1fe6dd8-ba31-4d61-89e7-88639da4683d: Scope
+    b340eb25-3456-403f-be2f-af7a0d370277: Scope
+    37f7f235-527c-4136-accd-4a02d197296e: Scope
+    7427e0e9-2fba-42fe-b0c0-848c9e6a8182: Scope
+    64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0: Scope
+    14dad69e-099b-42c9-810b-d002981feec1: Scope
+    7ab1d382-f21e-4acd-a863-ba3e13f7da61: Scope
+  00000002-0000-0000-c000-000000000000:
+    311a71cc-e848-46a1-bdf8-97ff7156d8e6: Scope
+    cba73afc-7f69-4d86-8450-4978e04ecd1a: Scope
+    5778995a-e1bf-45b8-affa-663a9f3f4d04: Scope
+  00000009-0000-0000-c000-000000000000:
+    47df08d3-85e6-4bd3-8c77-680fbe28162e: Scope
+    2448370f-f988-42cd-909c-6528efd67c1a: Scope
+    4ae1bf56-f562-4747-b7bc-2fa0874ed46f: Scope
+    7f33e027-4039-419b-938e-2f8ca153e68e: Scope
+    7504609f-c495-4c64-8542-686125a5a36f: Scope
+  

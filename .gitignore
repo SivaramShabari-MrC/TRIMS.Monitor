@@ -1,0 +1,13 @@
+*.swp
+*~
+*.user
+*.log
+*.vs/
+*.obj/
+*.bin/
+*.pdb/
+*.userprefs
+*.suo
+*.cache
+bin/
+obj/
