@@ -94,7 +94,6 @@ namespace TRIMS.Monitor.Service
                 File.Create(destination).Close();
                 await File.WriteAllBytesAsync(destination, file);
                 File.Delete(source);
-                return;
             }
             catch (Exception e)
             {

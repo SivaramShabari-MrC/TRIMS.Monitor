@@ -70,13 +70,15 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.AddSingleton<IEnvironmentManager, EnvironmentManager>();
 builder.Services.AddSingleton<IFileMonitorThreadManager, FileMonitorThreadManager>();
 builder.Services.AddSingleton<IFileMonitorThreadService, FileMonitorThreadService>();
 builder.Services.AddSingleton<IBAIFileStatusManager, BAIFileStatusManager>();
 builder.Services.AddSingleton<IBAIFileStatusRepository, BAIFileStatusRepository>();
 builder.Services.AddSingleton<ITransactionManager, TransactionManager>();
 builder.Services.AddSingleton<ITransactionRepository, TransactionRepository>();
+builder.Services.AddSingleton<IScheduledTaskService, ScheduledTaskService>();
+builder.Services.AddSingleton<IScheduledTaskManager, ScheduledTaskManager>();
+builder.Services.AddSingleton<IContactApiService, ContactApiService>();
 builder.Services.AddSingleton<ISecurityAuditRepository, SecurityAuditRepository>();
 
 builder.Services.AddCors(o => o.AddPolicy("AllowAll",

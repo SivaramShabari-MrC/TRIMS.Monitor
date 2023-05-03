@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,14 +12,14 @@ namespace TRIMS.Monitor.Manager
 {
     public class FileMonitorThreadManager : IFileMonitorThreadManager
     {
-        private readonly IEnvironmentManager _environmentManager;
+        private readonly IConfiguration _config;
         private readonly IFileMonitorThreadService _fileMonitorThreadService;
         private readonly ILogger<FileMonitorThreadManager> _logger;
         private readonly ISecurityAuditRepository _securityAuditRepository;
 
-        public FileMonitorThreadManager(IEnvironmentManager environmentManager, IFileMonitorThreadService monitorFileService, ISecurityAuditRepository securityAuditRepository, ILogger<FileMonitorThreadManager> logger)
+        public FileMonitorThreadManager(IConfiguration config, IFileMonitorThreadService monitorFileService, ISecurityAuditRepository securityAuditRepository, ILogger<FileMonitorThreadManager> logger)
         {
-            _environmentManager = environmentManager;
+            _config = config;
             _fileMonitorThreadService = monitorFileService;
             _securityAuditRepository = securityAuditRepository;
 
@@ -26,7 +27,7 @@ namespace TRIMS.Monitor.Manager
 
         public async Task<FileMonitorThread[]?> GetMonitorThreads(EnvironmentType environment, SystemType system, bool includeFiles, FolderType? folder)
         {
-            string configFilePath = _environmentManager.GetConfigFilePath(environment, system);
+            string configFilePath = Utils.GetConfigFilePath(environment, system, _config);
             try
             {
                 var fileMonitorThreads = await _fileMonitorThreadService.GetMonitorThreads(configFilePath, includeFiles, folder);
@@ -41,7 +42,7 @@ namespace TRIMS.Monitor.Manager
 
         public async Task<ThreadFolderFiles[]> GetFilesFromThreadFolder(EnvironmentType environment, SystemType system, string[] threadNames, FolderType folder)
         {
-            string configFilePath = _environmentManager.GetConfigFilePath(environment, system);
+            string configFilePath = Utils.GetConfigFilePath(environment, system, _config);
             try
             {
                 var fileMonitorThreads = await _fileMonitorThreadService.GetMonitorThreads(configFilePath, false, folder);
@@ -66,30 +67,40 @@ namespace TRIMS.Monitor.Manager
             }
         }
 
-        public async Task MoveFile(EnvironmentType env, SystemType system, string threadName, FolderType from, FolderType to, string fileName)
+        public async Task MoveFile(EnvironmentType environment, SystemType system, string threadName, FolderType from, FolderType to, string fileName)
         {
             if (from != FolderType.ErrorsFolder && from != FolderType.SourceFolder)
                 throw new Exception("Cannot move files from folders other than Error and SourceFolder");
             if (to != FolderType.DebugFolder && to != FolderType.SourceFolder)
                 throw new Exception("Cannot move files to folder other then Debug and SourceFolder");
-            string configFilePath = _environmentManager.GetConfigFilePath(env, system);
+            string configFilePath = Utils.GetConfigFilePath(environment, system, _config);
             var fileMonitorThreads = await _fileMonitorThreadService.GetMonitorThreads(configFilePath, false, null);
             var fromPath = GetFolderPath(fileMonitorThreads, threadName, from);
             var toPath = GetFolderPath(fileMonitorThreads, threadName, to);
+            await _securityAuditRepository.LogAudit(new SecurityAudit()
+            {
+                Action = Utils.GetAuditLogActionName(ActionType.MoveFile),
+                DateTime = DateTime.Now,
+                Description = $"FileName:{fileName}; FromFolder:{Utils.GetFolderName(from)}; ToFolder:{Utils.GetFolderName(to)}",
+                Environment = Utils.GetEnvironmentName(environment),
+                SystemType = Utils.GetSystemName(system),
+                ThreadName = threadName,
+                UserEmail = "Sivaram.ShabariA@mrcooper.com"
+            });
             await _fileMonitorThreadService.MoveFile(fromPath, toPath, fileName);
             return;
         }
 
         public async Task<byte[]> DownloadFile(EnvironmentType environment, SystemType system, string threadName, FolderType folder, string fileName)
         {
-            string configFilePath = _environmentManager.GetConfigFilePath(environment, system);
+            string configFilePath = Utils.GetConfigFilePath(environment, system, _config);
             await _securityAuditRepository.LogAudit(new SecurityAudit()
             {
-                Action = ActionType.DownloadFile,
+                Action = Utils.GetAuditLogActionName(ActionType.DownloadFile),
                 DateTime = DateTime.Now,
-                Description = $"ThreadName={threadName}; FileName:{fileName}; Folder:{Utils.GetFolderName(folder)}",
-                Environment = environment,
-                SystemType = system,
+                Description = $"FileName:{fileName}; Folder:{Utils.GetFolderName(folder)}",
+                Environment = Utils.GetEnvironmentName(environment),
+                SystemType = Utils.GetSystemName(system),
                 ThreadName = threadName,
                 UserEmail = "Sivaram.ShabariA@mrcooper.com"
             });
@@ -98,26 +109,26 @@ namespace TRIMS.Monitor.Manager
 
         public async Task<FMSWindowsServiceStatus> GetFMSWindowsServiceStatus(EnvironmentType environment)
         {
-            string serverName = _environmentManager.GetEnvironmentServer(environment);
-            string fmsServiceName = _environmentManager.GetWindowsServiceName(SystemType.FMS);
-            string bfmsServiceName = _environmentManager.GetWindowsServiceName(SystemType.BFMS);
+            string serverName = Utils.GetEnvironmentServer(environment, _config);
+            string fmsServiceName = Utils.GetWindowsServiceName(SystemType.FMS, _config);
+            string bfmsServiceName = Utils.GetWindowsServiceName(SystemType.BFMS, _config);
             return await _fileMonitorThreadService.GetFMSWindowsServiceStatus(serverName, fmsServiceName, bfmsServiceName);
         }
 
         public async Task ExecuteWindowsServiceAction(EnvironmentType environment, SystemType systemType, FMSWindowsServiceCommand commandType)
         {
-            string serverName = _environmentManager.GetEnvironmentServer(environment);
+            string serverName = Utils.GetEnvironmentServer(environment, _config);
             string serviceName = systemType == SystemType.FMS ?
-                _environmentManager.GetWindowsServiceName(SystemType.FMS) :
-                _environmentManager.GetWindowsServiceName(SystemType.BFMS);
+                Utils.GetWindowsServiceName(SystemType.FMS, _config) :
+                Utils.GetWindowsServiceName(SystemType.BFMS, _config);
             await _securityAuditRepository.LogAudit(new SecurityAudit()
             {
-                Action = systemType == SystemType.FMS ? 
-                                        commandType == FMSWindowsServiceCommand.Start ? ActionType.StartFMS : ActionType.StopFMS 
-                                        : commandType == FMSWindowsServiceCommand.Start ? ActionType.StartBFMS : ActionType.StopBFMS,
+                Action = Utils.GetAuditLogActionName(systemType == SystemType.FMS ?
+                                        commandType == FMSWindowsServiceCommand.Start ? ActionType.StartFMS : ActionType.StopFMS
+                                        : commandType == FMSWindowsServiceCommand.Start ? ActionType.StartBFMS : ActionType.StopBFMS),
                 DateTime = DateTime.Now,
                 Description = $"",
-                Environment = environment,
+                Environment = Utils.GetEnvironmentName(environment),
                 SystemType = null,
                 ThreadName = null,
                 UserEmail = "Sivaram.ShabariA@mrcooper.com"

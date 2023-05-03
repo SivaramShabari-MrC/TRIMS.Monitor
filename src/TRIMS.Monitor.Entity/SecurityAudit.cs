@@ -11,9 +11,9 @@ namespace TRIMS.Monitor.Entity
         public SecurityAudit() { }
         public string UserEmail { get; set; } = string.Empty;
         public DateTime DateTime { get; set; } 
-        public ActionType Action { get; set; }
-        public EnvironmentType Environment { get; set; }
-        public SystemType? SystemType { get; set; }
+        public string Action { get; set; }
+        public string Environment { get; set; }
+        public string? SystemType { get; set; }
         public string Description { get; set; } = string.Empty;
         public string? ThreadName { get; set; }
 
@@ -27,4 +27,5 @@ namespace TRIMS.Monitor.Entity
         MoveFile,
         DownloadFile,
     }
+
 }
