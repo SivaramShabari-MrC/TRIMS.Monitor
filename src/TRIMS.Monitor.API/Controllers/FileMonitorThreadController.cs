@@ -21,11 +21,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [Route("/fileMonitorThreads/all")]
         [HttpGet]
-        public IActionResult Get(SystemType system, bool includeFiles, FolderType folder)
+        public IActionResult Get(SystemType system)
         {
             try
             {
-                var res =  _fileMonitorThreadManager.GetMonitorThreads(system, folder);
+                var res =  _fileMonitorThreadManager.GetMonitorThreads(system);
                 return Ok(res);
             }
             catch (Exception ex)

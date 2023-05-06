@@ -20,12 +20,12 @@ namespace TRIMS.Monitor.Manager
             _logger = logger;
         }
 
-        public FileMonitorThread[]? GetMonitorThreads(SystemType system, FolderType? folder)
+        public FileMonitorThread[]? GetMonitorThreads(SystemType system)
         {
             string configFilePath = system == SystemType.FMS ? _config.FileMonitorConfig.ConfigFilePath.FMS : _config.FileMonitorConfig.ConfigFilePath.BFMS;
             try
             {
-                var fileMonitorThreads =  _fileMonitorThreadService.GetMonitorThreads(configFilePath, folder);
+                var fileMonitorThreads =  _fileMonitorThreadService.GetMonitorThreads(configFilePath);
                 return fileMonitorThreads ?? Array.Empty<FileMonitorThread>();
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace TRIMS.Monitor.Manager
 
             try
             {
-                var fileMonitorThreads = _fileMonitorThreadService.GetMonitorThreads(configFilePath, folder);
+                var fileMonitorThreads = _fileMonitorThreadService.GetMonitorThreads(configFilePath);
                 List<ThreadFolderFiles> result = new();
                 foreach (var threadName in threadNames)
                 {
@@ -70,7 +70,7 @@ namespace TRIMS.Monitor.Manager
             if (to != FolderType.DebugFolder && to != FolderType.SourceFolder)
                 throw new Exception("Cannot move files to folder other then Debug and SourceFolder");
             string configFilePath = system == SystemType.FMS ? _config.FileMonitorConfig.ConfigFilePath.FMS : _config.FileMonitorConfig.ConfigFilePath.BFMS;
-            var fileMonitorThreads =  _fileMonitorThreadService.GetMonitorThreads(configFilePath, null);
+            var fileMonitorThreads =  _fileMonitorThreadService.GetMonitorThreads(configFilePath);
             var fromPath = GetFolderPath(fileMonitorThreads, threadName, from);
             var toPath = GetFolderPath(fileMonitorThreads, threadName, to);
             await _securityAuditRepository.LogAudit(new SecurityAudit()

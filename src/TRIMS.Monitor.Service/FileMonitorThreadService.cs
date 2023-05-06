@@ -22,7 +22,7 @@ namespace TRIMS.Monitor.Service
         {
             _logger = logger;
         }
-        public FileMonitorThread[]? GetMonitorThreads(string configFilePath, FolderType? folder)
+        public FileMonitorThread[]? GetMonitorThreads(string configFilePath)
         {
             string configFileXML = File.ReadAllText(configFilePath);
             XmlDocument configFileDocument = new();
@@ -65,7 +65,7 @@ namespace TRIMS.Monitor.Service
         {
             try
             {
-                var fileMonitorThreads = GetMonitorThreads(configFilePath, null);
+                var fileMonitorThreads = GetMonitorThreads(configFilePath);
                 var folderPath = GetFolderPath(fileMonitorThreads, threadName, folder);
                 FileStream fileStream = new FileStream($@"{folderPath}/{fileName}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var memStream = new MemoryStream();
