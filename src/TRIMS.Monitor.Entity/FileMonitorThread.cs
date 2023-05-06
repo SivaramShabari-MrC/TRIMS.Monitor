@@ -19,7 +19,7 @@ namespace TRIMS.Monitor.Entity
 
         [JsonProperty("endPoints")]
         public Endpoints? Endpoint { get; set; }
-        public FileDetail[]? Files { get; set; }
+        //public FileDetail[]? Files { get; set; }
 
     }
     

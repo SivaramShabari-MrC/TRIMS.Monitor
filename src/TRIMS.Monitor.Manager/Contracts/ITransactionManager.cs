@@ -9,6 +9,6 @@ namespace TRIMS.Monitor.Manager
 {
     public interface ITransactionManager
     {
-        public Task<List<TransactionReport>> GetTransactionReport(EnvironmentType environment, DateTime from, DateTime to);
+        public Task<List<TransactionReport>> GetTransactionReport(DateTime from, DateTime to);
     }
 }

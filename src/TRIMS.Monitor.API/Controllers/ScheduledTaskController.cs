@@ -16,9 +16,9 @@ namespace TRIMS.Monitor.API.Controllers
 
         [Route("/scheduledTasks")]
         [HttpGet]
-        public async Task<IActionResult> GetScheduledTasks(EnvironmentType environment)
+        public async Task<IActionResult> GetScheduledTasks()
         {
-            return Ok(await _scheduledTaskManager.GetScheduledTasks(environment));
+            return Ok(await _scheduledTaskManager.GetScheduledTasks());
         }
     }
 }

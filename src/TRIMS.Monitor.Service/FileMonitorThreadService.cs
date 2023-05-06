@@ -22,7 +22,7 @@ namespace TRIMS.Monitor.Service
         {
             _logger = logger;
         }
-        public async Task<FileMonitorThread[]?> GetMonitorThreads(string configFilePath, bool includeFiles, FolderType? folder)
+        public FileMonitorThread[]? GetMonitorThreads(string configFilePath, FolderType? folder)
         {
             string configFileXML = File.ReadAllText(configFilePath);
             XmlDocument configFileDocument = new();
@@ -30,14 +30,12 @@ namespace TRIMS.Monitor.Service
             string monitorsJson = JsonConvert.SerializeXmlNode(configFileDocument);
             ConfigFile? configFileJson = JsonConvert.DeserializeObject<ConfigFile>(monitorsJson);
             var fileMonitorThreads = configFileJson?.Configuration?.FileMonitorSection?.Monitors?.AddMonitor;
-            if (fileMonitorThreads != null && includeFiles)
-                await AddFilesToMonitors(fileMonitorThreads, folder ?? FolderType.SourceFolder);
             return fileMonitorThreads;
         }
 
         public FileDetail[] GetFilesFromFolder(string filePath)
         {
-            if (filePath == "") return Array.Empty <FileDetail> ();
+            if (filePath == "") return Array.Empty<FileDetail>();
             IList<FileDetail> result = new List<FileDetail>(); ;
             StringBuilder builder = new(filePath);
             if (builder.ToString().Contains("C:")) builder.Replace("C:", @"\\crctappsdev01"); //replace C: with dev endpoint
@@ -63,16 +61,15 @@ namespace TRIMS.Monitor.Service
             return result.ToArray();
         }
 
-        public async Task<byte[]> DownloadFile(string configFilePath, string threadName, FolderType folder, string fileName)
+        public byte[] DownloadFile(string configFilePath, string threadName, FolderType folder, string fileName)
         {
             try
             {
-                var fileMonitorThreads = await GetMonitorThreads(configFilePath, false, null);
+                var fileMonitorThreads = GetMonitorThreads(configFilePath, null);
                 var folderPath = GetFolderPath(fileMonitorThreads, threadName, folder);
                 FileStream fileStream = new FileStream($@"{folderPath}/{fileName}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var memStream = new MemoryStream();
                 fileStream.CopyTo(memStream);
-                
                 return memStream.ToArray();
             }
             catch (Exception e)
@@ -81,23 +78,34 @@ namespace TRIMS.Monitor.Service
             }
         }
 
-        public async Task MoveFile(string sourcePath, string destinationPath, string fileName)
+        public void MoveFile(string sourcePath, string destinationPath, string fileName)
         {
             try
             {
-                var destination = destinationPath + "\\" + fileName;
-                if (File.Exists(destination))
-                    throw new Exception("File already exists in destination path");
+                // Check if source file exists
+                var source = Path.Combine(sourcePath, fileName);
+                if (!File.Exists(source))
+                    throw new FileNotFoundException($"Source file {fileName} not found at {sourcePath}");
 
-                var source = sourcePath + "\\" + fileName;
-                byte[] file = File.ReadAllBytes(source);
-                File.Create(destination).Close();
-                await File.WriteAllBytesAsync(destination, file);
-                File.Delete(source);
+                // Check if destination file already exists
+                var destination = Path.Combine(destinationPath, fileName);
+                if (File.Exists(destination))
+                    throw new IOException($"Destination file {fileName} already exists at {destinationPath}");
+
+                // Move the file to the destination
+                File.Move(source, destination);
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new Exception($"Error while moving file {fileName} from {sourcePath} to {destinationPath}. {e.Message}");
+            }
+            catch (IOException e)
+            {
+                throw new Exception($"Error while moving file {fileName} from {sourcePath} to {destinationPath}. {e.Message}");
             }
             catch (Exception e)
             {
-                throw new Exception($"Error while moving file {fileName} from {sourcePath} to {destinationPath}. Error: {e}");
+                throw new Exception($"Error while moving file {fileName} from {sourcePath} to {destinationPath}. {e.Message}");
             }
         }
 
@@ -135,10 +143,10 @@ namespace TRIMS.Monitor.Service
                     string? line = process.StandardOutput.ReadLine();
                     output += line + "\n";
                 }
-                List<ServiceInfo> serviceInfoList = JsonConvert.DeserializeObject<List<ServiceInfo>>(output);
+                List<ServiceInfo>? serviceInfoList = JsonConvert.DeserializeObject<List<ServiceInfo>>(output);
 
-                string FMS = serviceInfoList?.Where(x => x.Name == fmsServiceName).FirstOrDefault()!.Status.Value!;
-                string BFMS = serviceInfoList?.Where(x => x.Name == bfmsServiceName).FirstOrDefault()!.Status.Value!;
+                string FMS = serviceInfoList?.Where(x => x.Name == fmsServiceName).FirstOrDefault()!.Status?.Value!;
+                string BFMS = serviceInfoList?.Where(x => x.Name == bfmsServiceName).FirstOrDefault()!.Status?.Value!;
                 return new FMSWindowsServiceStatus { FMS = FMS, BFMS = BFMS };
             }
             catch (Exception ex)
@@ -188,17 +196,6 @@ namespace TRIMS.Monitor.Service
             }
         }
 
-        private async Task AddFilesToMonitors(FileMonitorThread[] monitors, FolderType folder)
-        {
-            var monitorsWithFiles = new List<FileMonitorThread>();
-            var files = await GetallFilesFromThreadFolder(monitors, folder);
-            foreach (var m in monitors)
-            {
-                m.Files = files.Where(f => f.ThreadName == m.ThreadName).FirstOrDefault()?.Files;
-                monitorsWithFiles.Add(m);
-            }
-        }
-
         private string GetFolderPath(FileMonitorThread[]? fileMonitorThreads, string threadName, FolderType folder)
         {
             if (fileMonitorThreads == null) return string.Empty;
@@ -224,35 +221,6 @@ namespace TRIMS.Monitor.Service
             return folderPath;
         }
 
-        private async Task<ThreadFolderFiles[]> GetallFilesFromThreadFolder(FileMonitorThread[]? fileMonitorThreads, FolderType folder)
-        {
-            List<ThreadFolderFiles> result = new();
-            foreach (var threadName in fileMonitorThreads!.Select(t => t.ThreadName))
-            {
-                ThreadFolderFiles threadFolderFiles = new(threadName, folder, null)
-                {
-                    FolderPath = GetFolderPath(fileMonitorThreads, threadName, folder)
-                };
-                result.Add(threadFolderFiles);
-            }
-            var tasks = result.Select(
-                threadFolder =>
-                Task.Run(() => GetThreadFolderFiles(threadFolder)
-                )
-                );
-            var results = await Task.WhenAll(tasks);
-
-            return results.ToArray();
-        }
-
-        private ThreadFolderFiles GetThreadFolderFiles(ThreadFolderFiles threadFolder)
-        {
-            var result = new ThreadFolderFiles(threadFolder.ThreadName, threadFolder.Folder, null);
-            var files = GetFilesFromFolder(threadFolder.FolderPath);
-            result.Files = files;
-            return result;
-        }
-
         private static string GetStopServiceCommand(string serverName, string serviceName)
         {
             return $"/C invoke-command -ComputerName {serverName} -ScriptBlock {{ " +
@@ -269,17 +237,17 @@ namespace TRIMS.Monitor.Service
 
         private class ServiceInfo
         {
-            public string Name { get; set; }
-            public StatusInfo Status { get; set; }
-            public string PSComputerName { get; set; }
-            public string RunspaceId { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public StatusInfo? Status { get; set; }
+            public string PSComputerName { get; set; } = string.Empty;
+            public string RunspaceId { get; set; } = string.Empty;
             public bool PSShowComputerName { get; set; }
         }
 
         private class StatusInfo
         {
             public int value { get; set; }
-            public string Value { get; set; }
+            public string Value { get; set; } = string.Empty;
         }
 
     }

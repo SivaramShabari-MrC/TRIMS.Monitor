@@ -11,6 +11,6 @@ namespace TRIMS.Monitor.Manager
 {
     public interface IScheduledTaskManager
     {
-        public Task<ScheduledTask[]> GetScheduledTasks(EnvironmentType environment);
+        public Task<ScheduledTask[]> GetScheduledTasks();
     }
 }

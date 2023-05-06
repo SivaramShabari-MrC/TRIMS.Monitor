@@ -12,17 +12,17 @@ namespace TRIMS.Monitor.Manager
     public class ScheduledTaskManager : IScheduledTaskManager
     {
         private readonly IScheduledTaskService _scheduledTaskService;
-        private readonly IConfiguration _config;
+        private readonly AppSettingsConfig _config;
 
-        public ScheduledTaskManager(IConfiguration config, IScheduledTaskService scheduledTaskService)
+        public ScheduledTaskManager(AppSettingsConfig config, IScheduledTaskService scheduledTaskService)
         {
             _scheduledTaskService = scheduledTaskService;
             _config = config;
         }
 
-        public async Task<ScheduledTask[]> GetScheduledTasks(EnvironmentType environment)
+        public async Task<ScheduledTask[]> GetScheduledTasks()
         {
-            return await _scheduledTaskService.GetScheduledTasks(Utils.GetEnvironmentServer(environment, _config));
+            return await _scheduledTaskService.GetScheduledTasks(_config.ServerName);
         }
     }
 }

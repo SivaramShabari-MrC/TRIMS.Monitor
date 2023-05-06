@@ -4,6 +4,6 @@ namespace TRIMS.Monitor.Repository
 {
     public interface ITransactionRepository
     {
-        public Task<List<TransactionReport>> GetTransactionReport(EnvironmentType environment, DateTime from, DateTime to);
+        public Task<List<TransactionReport>> GetTransactionReport(DateTime from, DateTime to);
     }
 }

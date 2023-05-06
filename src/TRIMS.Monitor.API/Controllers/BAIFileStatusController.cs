@@ -17,11 +17,11 @@ namespace TRIMS.Monitor.API.Controllers
         }
         [Route("/BAIFileStatus")]
         [HttpGet]
-        public async Task<IActionResult> GetBAIFileStatus(EnvironmentType environment, DateTime date)
+        public async Task<IActionResult> GetBAIFileStatus(DateTime date)
         {
             try
             {
-                var result = await _BAIFileStatusManager.CheckFileForDate(environment, date);
+                var result = await _BAIFileStatusManager.CheckFileForDate(date);
                 return Ok(result);
             }
             catch (Exception ex)

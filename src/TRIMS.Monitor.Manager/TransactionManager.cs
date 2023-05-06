@@ -10,9 +10,9 @@ namespace TRIMS.Monitor.Manager
         {
             _repository = repository;
         }
-        public async Task<List<TransactionReport>> GetTransactionReport(EnvironmentType environment, DateTime from, DateTime to)
+        public async Task<List<TransactionReport>> GetTransactionReport(DateTime from, DateTime to)
         {
-            return await _repository.GetTransactionReport(environment, from, to);
+            return await _repository.GetTransactionReport(from, to);
         }
     }
 }

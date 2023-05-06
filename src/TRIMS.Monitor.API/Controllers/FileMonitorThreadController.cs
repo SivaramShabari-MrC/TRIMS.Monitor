@@ -21,11 +21,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [Route("/fileMonitorThreads/all")]
         [HttpGet]
-        public async Task<IActionResult> Get(EnvironmentType environment, SystemType system, bool includeFiles, FolderType folder)
+        public IActionResult Get(SystemType system, bool includeFiles, FolderType folder)
         {
             try
             {
-                var res = await _fileMonitorThreadManager.GetMonitorThreads(environment, system, includeFiles, folder);
+                var res =  _fileMonitorThreadManager.GetMonitorThreads(system, folder);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -36,11 +36,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [HttpGet]
         [Route("/fileMonitorThreads/files")]
-        public async Task<IActionResult> GetFilecount(EnvironmentType environment, SystemType system, string threadNames, FolderType folder)
+        public async Task<IActionResult> GetFilecount(SystemType system, string threadNames, FolderType folder)
         {
             try
             {
-                var res = await _fileMonitorThreadManager.GetFilesFromThreadFolder(environment, system, threadNames.Trim().Split(",").Select(x=>x.Trim()).ToArray(), folder);
+                var res = await _fileMonitorThreadManager.GetFilesFromThreadFolder(system, threadNames.Trim().Split(",").Select(x=>x.Trim()).ToArray(), folder);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -51,11 +51,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [HttpGet]
         [Route("/fileMonitorThreads/downloadFile")]
-        public async Task<IActionResult> DownloadFile(EnvironmentType environment, SystemType system, string threadName, FolderType folder, string fileName)
+        public async Task<IActionResult> DownloadFile(SystemType system, string threadName, FolderType folder, string fileName)
         {
             try
             {
-                return Ok(await _fileMonitorThreadManager.DownloadFile(environment, system, threadName, folder, fileName));
+                return Ok(await _fileMonitorThreadManager.DownloadFile(system, threadName, folder, fileName));
             }
             catch (Exception e)
             {
@@ -65,11 +65,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [HttpGet]
         [Route("/fileMonitorThreads/moveFile")]
-        public async Task<IActionResult> MoveFile(EnvironmentType environment, SystemType system, string threadName, FolderType from, FolderType to, string fileName)
+        public async Task<IActionResult> MoveFile(SystemType system, string threadName, FolderType from, FolderType to, string fileName)
         {
             try
             {
-                await _fileMonitorThreadManager.MoveFile(environment, system, threadName, from, to, fileName);
+                await _fileMonitorThreadManager.MoveFile(system, threadName, from, to, fileName);
                 return Ok();
             }
             catch (Exception e)
@@ -80,16 +80,16 @@ namespace TRIMS.Monitor.API.Controllers
 
         [HttpGet]
         [Route("/fileMonitorThreads/windowsService/status")]
-        public async Task<IActionResult> GetFMSWindowsServiceStatus(EnvironmentType environment)
+        public async Task<IActionResult> GetFMSWindowsServiceStatus()
         {
-            return Ok(await _fileMonitorThreadManager.GetFMSWindowsServiceStatus(environment));
+            return Ok(await _fileMonitorThreadManager.GetFMSWindowsServiceStatus());
         }
 
         [HttpGet]
         [Route("/fileMonitorThreads/windowsService/execute")]
-        public async Task<IActionResult> ExecuteWindowsServiceAction(EnvironmentType environment, SystemType system, FMSWindowsServiceCommand command)
+        public async Task<IActionResult> ExecuteWindowsServiceAction(SystemType system, FMSWindowsServiceCommand command)
         {
-            await _fileMonitorThreadManager.ExecuteWindowsServiceAction(environment, system, command);
+            await _fileMonitorThreadManager.ExecuteWindowsServiceAction(system, command);
             return Ok();
         }
     }

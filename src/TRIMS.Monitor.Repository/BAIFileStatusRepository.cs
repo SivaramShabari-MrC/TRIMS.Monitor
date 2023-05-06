@@ -8,49 +8,44 @@ namespace TRIMS.Monitor.Repository
 {
     public class BAIFileStatusRepository : IBAIFileStatusRepository
     {
-        private readonly IConfiguration _config;
-        public BAIFileStatusRepository(IConfiguration config)
+        private readonly IDbConnection _connection;
+        public BAIFileStatusRepository(AppSettingsConfig config)
         {
-            _config = config;
+            _connection = new SqlConnection(config.ConnectionStrings.TRIMS);
         }
 
-        public async Task<IEnumerable<ApplicationSetting>> GetAll(EnvironmentType environment)
+        public async Task<IEnumerable<ApplicationSetting>> GetAll()
         {
-            var applicationSettings = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting");
+            var applicationSettings = await _connection.QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting");
             return applicationSettings;
         }
 
-        public async Task<IEnumerable<ApplicationSetting>> GetApplicationSettingsStartsWith(EnvironmentType environment, string startsWith)
+        public async Task<IEnumerable<ApplicationSetting>> GetApplicationSettingsStartsWith(string startsWith)
         {
-            var applicationSettings = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting WHERE settingcode LIKE @startsWith", new { startsWith = startsWith + "%" });
+            var applicationSettings = await _connection.QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting WHERE settingcode LIKE @startsWith", new { startsWith = startsWith + "%" });
             return applicationSettings;
         }
 
-        public async Task<ApplicationSetting> Get(EnvironmentType environment, string settingCode)
+        public async Task<ApplicationSetting> Get(string settingCode)
         {
-            var applicationSetting = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting WHERE settingcode = @settingCode", new { settingCode });
+            var applicationSetting = await _connection.QueryAsync<ApplicationSetting>("SELECT * FROM tbl_applicationsetting WHERE settingcode = @settingCode", new { settingCode });
             return applicationSetting.First();
         }
 
-        public async Task<IEnumerable<USP_CheckPrioryDayFile>> CheckPriorDayFileExists(EnvironmentType environment, DateTime previousBusinessDate, string originatorIDList)
+        public async Task<IEnumerable<USP_CheckPrioryDayFile>> CheckPriorDayFileExists(DateTime previousBusinessDate, string originatorIDList)
         {
-            var priordayFiles = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<USP_CheckPrioryDayFile>("exec [dbo].[usp_CheckPrioryDayFile] @PreviousBusinessDate, @OriginatorIDList", new { previousBusinessDate, originatorIDList });
+            var priordayFiles = await _connection.QueryAsync<USP_CheckPrioryDayFile>("exec [dbo].[usp_CheckPrioryDayFile] @PreviousBusinessDate, @OriginatorIDList", new { previousBusinessDate, originatorIDList });
             return priordayFiles;
         }
 
-        public async Task<bool> CheckPriorDayHoliday(EnvironmentType environment, DateTime inputDate)
+        public async Task<bool> CheckPriorDayHoliday(DateTime inputDate)
         {
-            var holidays = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<Holiday>("SELECT * FROM tbl_holiday");
+            var holidays = await _connection.QueryAsync<Holiday>("SELECT * FROM tbl_holiday");
             bool result = holidays.Any(h => h.HYear == inputDate.Year && h.HDay == inputDate.Date);
             return result;
         }
 
-        public async Task<List<BAIFileStatusResponse>> ReplaceRoutingNumbersWithBankName(EnvironmentType environment, List<BAIFileStatusResponse> list)
+        public async Task<List<BAIFileStatusResponse>> ReplaceRoutingNumbersWithBankName(List<BAIFileStatusResponse> list)
         {
             var res = list;
             List<string> routingNumbers = new();
@@ -60,8 +55,7 @@ namespace TRIMS.Monitor.Repository
                 if (isNumeric)
                     routingNumbers.Add(item.BankName);
             }
-            var map = await Utils.GetTRIMSDbConnection(environment, _config)
-                .QueryAsync<RoutingNumberBankName>(@"SELECT BankName, bankRoutingNumber  FROM tbl_bank  B
+            var map = await _connection.QueryAsync<RoutingNumberBankName>(@"SELECT BankName, bankRoutingNumber  FROM tbl_bank  B
                                                             LEFT JOIN tbl_BankRouting R 
                                                             ON B.bankid=R.bankid
                                                             WHERE R.bankroutingnumber IN @routingNumbers",

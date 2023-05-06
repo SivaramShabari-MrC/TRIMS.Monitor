@@ -18,11 +18,11 @@ namespace TRIMS.Monitor.API.Controllers
 
         [Route("/transactionReport")]
         [HttpGet]
-        public async Task<IActionResult> GetTransactionReport(EnvironmentType environment, DateTime from, DateTime to)
+        public async Task<IActionResult> GetTransactionReport(DateTime from, DateTime to)
         {
             try
             {
-                var result = await _transactionManager.GetTransactionReport(environment, from, to);
+                var result = await _transactionManager.GetTransactionReport(from, to);
                 return Ok(result);
             }
             catch (Exception ex)

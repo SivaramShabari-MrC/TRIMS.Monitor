@@ -8,10 +8,16 @@ using TRIMS.Monitor.Repository;
 using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+
 var AppSettings = builder.Configuration.GetSection(AppConfig.ApplicationConfig).Get<ApplicationConfig>();
 var AuthSettings = builder.Configuration.GetSection(AppConfig.AuthenticationConfig).Get<AuthenticationConfig>();
-var AzureAdSettings = builder.Configuration.GetSection(AppConfig.AzureAd).Get<AzureAd>();
+var AzureAdSettings = builder.Configuration.GetSection(AppConfig.AzureAd).Get<AzureAdConfig>();
 
+
+//
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
@@ -68,6 +74,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddSingleton(builder.Configuration.Get<AppSettingsConfig>());
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddSingleton<IFileMonitorThreadManager, FileMonitorThreadManager>();
@@ -90,7 +98,6 @@ builder.Services.AddCors(o => o.AddPolicy("AllowAll",
                       }));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

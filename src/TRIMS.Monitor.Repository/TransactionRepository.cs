@@ -1,20 +1,21 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using TRIMS.Monitor.Entity;
+
 namespace TRIMS.Monitor.Repository
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly IConfiguration _config;
-        public TransactionRepository(IConfiguration config)
+        private readonly IDbConnection _connection;
+        public TransactionRepository(AppSettingsConfig config)
         {
-            _config = config;
+            _connection = new SqlConnection(config.ConnectionStrings.TRIMS);
         }
-        public async Task<List<TransactionReport>> GetTransactionReport(EnvironmentType environment, DateTime from, DateTime to)
+        public async Task<List<TransactionReport>> GetTransactionReport(DateTime from, DateTime to)
         {
-            var connection = Utils.GetTRIMSDbConnection(environment, _config);
-            var result = await connection.QueryAsync<TransactionReport>(@"SELECT  TransactionTypeID AS type,  
+            
+            var result = await _connection.QueryAsync<TransactionReport>(@"SELECT  TransactionTypeID AS type,  
 	                                                                              banktransactionstatusname AS status, 
 	                                                                              COUNT(1) AS 'count'
                                                                           FROM tbl_BankTransaction  T

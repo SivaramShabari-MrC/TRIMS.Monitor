@@ -14,6 +14,6 @@ namespace TRIMS.Monitor.Manager
 {
     public interface IBAIFileStatusManager
     {
-        public Task<BAIFileStatusResponse[]> CheckFileForDate(EnvironmentType environment, DateTime date);
+        public Task<BAIFileStatusResponse[]> CheckFileForDate(DateTime date);
     }
 }

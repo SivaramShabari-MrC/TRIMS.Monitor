@@ -11,13 +11,6 @@ namespace TRIMS.Monitor.Entity
         public const string AuthenticationConfig = "AuthenticationConfig";
         public const string AzureAd = "AzureAd";
     }
-    public enum EnvironmentType
-    {
-        Development,
-        QA,
-        UAT,
-        Production
-    }
 
     public enum SystemType
     {

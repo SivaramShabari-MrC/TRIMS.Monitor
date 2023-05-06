@@ -35,6 +35,7 @@ namespace TRIMS.Monitor.API.Controllers
             }
             catch (Exception ex)
             {
+                return NotFound(ex);
             }
             return Ok("Hello");
         }
